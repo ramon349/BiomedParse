@@ -3,9 +3,9 @@ import torch
 import argparse
 from modeling.BaseModel import BaseModel
 from modeling import build_model
-from utils.distributed import init_distributed
-from utils.arguments import load_opt_from_config_files
-from utils.constants import BIOMED_CLASSES
+from utilities.distributed import init_distributed
+from utilities.arguments import load_opt_from_config_files
+from utilities.constants import BIOMED_CLASSES
 
 from inference_utils.inference import interactive_infer_image
 
@@ -19,12 +19,11 @@ def parse_option():
 
 cfg = parse_option()
 opt = load_opt_from_config_files([cfg.conf_files])
-#opt = init_distributed(opt)
-opt['device'] = torch.device('cuda')
+opt = init_distributed(opt)
 
 
 # Load model from pretrained weights
-pretrained_pth = 'pretrained/biomedparse_v2.pt'
+pretrained_pth = 'pretrained/biomed_parse.pt'
 
 model = BaseModel(opt, build_model(opt)).from_pretrained(pretrained_pth).eval().cuda()
 with torch.no_grad():

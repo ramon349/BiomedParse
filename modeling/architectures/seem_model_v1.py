@@ -25,8 +25,8 @@ from ..body import build_xdecoder_head
 from ..modules import sem_seg_postprocess, SetCriterion, HungarianMatcher, bbox_postprocess
 from ..language import build_language_encoder
 from ..language.loss import vl_similarity
-from utils.prompt_engineering import prompt_engineering
-from utils.constants import COCO_PANOPTIC_CLASSES, BIOMED_CLASSES
+from utilities.prompt_engineering import prompt_engineering
+from utilities.constants import COCO_PANOPTIC_CLASSES, BIOMED_CLASSES
 
 
 class GeneralizedSEEM(nn.Module):
@@ -957,7 +957,7 @@ class GeneralizedSEEM(nn.Module):
                 tokens = gtext['tokens']
                 
                 unique_hash_id = np.unique(grd_hash, return_index=True)[1]
-                selected_mask = np.zeros(len(grd_hash)).astype(np.bool)
+                selected_mask = np.zeros(len(grd_hash)).astype(bool)
                 selected_mask[unique_hash_id] = True
 
                 selected_token_emb = token_emb[selected_mask]
