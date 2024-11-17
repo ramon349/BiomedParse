@@ -1,7 +1,7 @@
 # **BiomedParse**
 This is the official repository for "A foundation model for joint segmentation, detection and recognition of biomedical objects across nine modalities"
 
-[[`Paper`](https://arxiv.org/abs/2405.12971)] [[`Demo`](https://microsoft.github.io/BiomedParse/)] [[`Model`](https://huggingface.co/microsoft/BiomedParse)]  [[`Data`](https://huggingface.co/datasets/microsoft/BiomedParseData)]
+[[`Paper`](https://aka.ms/biomedparse-paper)] [[`Demo`](https://microsoft.github.io/BiomedParse/)] [[`Model`](https://huggingface.co/microsoft/BiomedParse)]  [[`Data`](https://huggingface.co/datasets/microsoft/BiomedParseData)]
 
 ## Installation
 ```sh
@@ -36,7 +36,7 @@ pip install -r assets/requirements/requirements.txt
 BiomedParseData was created from preprocessing publicly available biomedical image segmentation datasets. Check a subset of our processed datasets on HuggingFace: https://huggingface.co/datasets/microsoft/BiomedParseData. For the source datasets, please check the details here: [BiomedParseData](assets/readmes/DATASET.md). As a quick start, we've samples a tiny demo dataset at biomedparse_datasets/BiomedParseData-Demo
 
 ## Model Checkpoints
-We host our model checkpoints on HuggingFace here: https://huggingface.co/microsoft/BiomedParse. Please expect future updates of the model as we are making it more robust and powerful based on feedbacks from the community. We recomment using the latest version of the model. Please put the model in the pretrained folder when runing the code.
+We host our model checkpoints on HuggingFace here: https://huggingface.co/microsoft/BiomedParse. Please download and put the model in the pretrained folder when runing the code. Expect future updates of the model as we are making it more robust and powerful based on feedbacks from the community. We recomment using the latest version of the model. 
 
 ## Finetune on Your Own Data
 While BiomedParse can take in arbitrary image and text prompt, it can only reasonably segment the targets that it has learned during pretraining! If you have a specific segmentation task that the latest checkpint doesn't do well, here is the instruction on how to finetune it on your own data. 
