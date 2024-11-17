@@ -1,6 +1,7 @@
 # **BiomedParse**
 This is the official repository for "A foundation model for joint segmentation, detection and recognition of biomedical objects across nine modalities"
-\[[Read Our arXiv Paper](https://arxiv.org/abs/2405.12971)\] \[[Check Our Demo](https://microsoft.github.io/BiomedParse/)\]
+
+[[`Paper`](https://arxiv.org/abs/2405.12971)] [[`Demo`](https://microsoft.github.io/BiomedParse/)] [[`Model`](https://huggingface.co/microsoft/BiomedParse)]  [[`Data`](https://huggingface.co/datasets/microsoft/BiomedParseData)]
 
 ## Installation
 ```sh
