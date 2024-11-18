@@ -37,6 +37,7 @@ BiomedParseData was created from preprocessing publicly available biomedical ima
 
 ## Model Checkpoints
 We host our model checkpoints on HuggingFace here: https://huggingface.co/microsoft/BiomedParse. 
+
 Step 1. Create pretrained model folder
 ```
 mkdir pretrained
