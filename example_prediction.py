@@ -1,6 +1,5 @@
 from PIL import Image
 import torch
-import argparse
 from modeling.BaseModel import BaseModel
 from modeling import build_model
 from utilities.distributed import init_distributed
@@ -10,18 +9,8 @@ import numpy as np
 
 from inference_utils.inference import interactive_infer_image
 
-# Build model config
-def parse_option():
-    parser = argparse.ArgumentParser('SEEM Demo', add_help=False)
-    parser.add_argument('--conf_files', default="configs/biomedparse_inference.yaml", metavar="FILE", help='path to config file', )
-    parser.add_argument('--model_path', default="pretrained/biomedparse.pt", metavar="FILE", help='path to model file')
-    cfg = parser.parse_args()
-    return cfg
-
-cfg = parse_option()
-opt = load_opt_from_config_files([cfg.conf_files])
+opt = load_opt_from_config_files(["configs/biomedparse_inference.yaml"])
 opt = init_distributed(opt)
-
 
 # Load model from pretrained weights
 pretrained_pth = 'pretrained/biomed_parse.pt'

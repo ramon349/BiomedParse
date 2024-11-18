@@ -112,13 +112,15 @@ bash assets/scripts/eval.sh
 This will continue evaluate the model on the test datasets you specified in configs/biomed_seg_lang_v1.yaml. We put BiomedParseData-Demo as the default. You can add any other datasets in the list.
 
 ## Run Inference
-Example inference code is provided in `example_prediction.py`. We provided example images in `examples` to load from. Model checkpoint is provided in `pretrained` to load from. Model configuration is provided in `configs/biomedparse_inference.yaml`.
+Example inference code is provided in `example_prediction.py`. We provided example images in `examples` to load from. Model configuration is provided in `configs/biomedparse_inference.yaml`.
+
+### Example Notebooks
+Check our inference examples for DICOM images at inference_examples_DICOM.ipynb.
  
 ### Model Setup
 ```sh
 from PIL import Image
 import torch
-import argparse
 from modeling.BaseModel import BaseModel
 from modeling import build_model
 from utils.distributed import init_distributed
@@ -128,15 +130,7 @@ from inference_utils.inference import interactive_infer_image
 import numpy as np
 
 # Build model config
-def parse_option():
-    parser = argparse.ArgumentParser('SEEM Demo', add_help=False)
-    parser.add_argument('--conf_files', default="configs/biomedparse_inference.yaml", metavar="FILE", help='path to config file', )
-    parser.add_argument('--model_path', default="pretrained/biomed_parse.pt", metavar="FILE", help='path to model file')
-    cfg = parser.parse_args()
-    return cfg
-
-cfg = parse_option()
-opt = load_opt_from_config_files([cfg.conf_files])
+opt = load_opt_from_config_files(["configs/biomedparse_inference.yaml"])
 opt = init_distributed(opt)
 
 # Load model from pretrained weights
@@ -205,6 +199,11 @@ bash docker/docker_run.sh
 bash docker/setup_inside_docker.sh
 source docker/data_env.sh 
 ``` -->
+
+## Citation
+Please cite our paper if you use the code, model, or data.
+
+Zhao, T., Gu, Y., Yang, J. et al. A foundation model for joint segmentation, detection and recognition of biomedical objects across nine modalities. Nat Methods (2024). https://doi.org/10.1038/s41592-024-02499-w
 
 ## Usage and License Notices
 The model described in this repository is provided for research and development use only. The model is not intended for use in clinical decision-making or for any other clinical use, and the performance of the model for clinical use has not been established. You bear sole responsibility for any use of this model, including incorporation into any product intended for clinical use.
