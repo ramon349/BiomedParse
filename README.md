@@ -1,7 +1,7 @@
 # **BiomedParse**
 This is the official repository for "A foundation model for joint segmentation, detection and recognition of biomedical objects across nine modalities"
 
-[[`Paper`](https://aka.ms/biomedparse-paper)] [[`Demo`](https://microsoft.github.io/BiomedParse/)] [[`Model`](https://huggingface.co/microsoft/BiomedParse)]  [[`Data`](https://huggingface.co/datasets/microsoft/BiomedParseData)]
+[[`Paper`](https://aka.ms/biomedparse-paper)] [[`Demo`](https://microsoft.github.io/BiomedParse/)] [[`Model`](https://huggingface.co/microsoft/BiomedParse)]  [[`Data`](https://huggingface.co/datasets/microsoft/BiomedParseData)]  [[`BibTeX`](#Citation)]
 
 ## Installation
 ```sh
@@ -36,7 +36,7 @@ pip install -r assets/requirements/requirements.txt
 BiomedParseData was created from preprocessing publicly available biomedical image segmentation datasets. Check a subset of our processed datasets on HuggingFace: https://huggingface.co/datasets/microsoft/BiomedParseData. For the source datasets, please check the details here: [BiomedParseData](assets/readmes/DATASET.md). As a quick start, we've samples a tiny demo dataset at biomedparse_datasets/BiomedParseData-Demo
 
 ## Model Checkpoints
-We host our model checkpoints on HuggingFace here: https://huggingface.co/microsoft/BiomedParse. 
+We host our model checkpoints on HuggingFace here: https://huggingface.co/microsoft/BiomedParse.
 
 Step 1. Create pretrained model folder
 ```
@@ -44,10 +44,10 @@ mkdir pretrained
 ```
 Step 2. Download model checkpoint and put the model in the pretrained folder when runing the code. Change file name to biomed_parse.pt
 
-Expect future updates of the model as we are making it more robust and powerful based on feedbacks from the community. We recomment using the latest version of the model. 
+Expect future updates of the model as we are making it more robust and powerful based on feedbacks from the community. We recomment using the latest version of the model.
 
 ## Finetune on Your Own Data
-While BiomedParse can take in arbitrary image and text prompt, it can only reasonably segment the targets that it has learned during pretraining! If you have a specific segmentation task that the latest checkpint doesn't do well, here is the instruction on how to finetune it on your own data. 
+While BiomedParse can take in arbitrary image and text prompt, it can only reasonably segment the targets that it has learned during pretraining! If you have a specific segmentation task that the latest checkpint doesn't do well, here is the instruction on how to finetune it on your own data.
 ### Raw Image and Annotation
 BiomedParse expects images and ground truth masks in 1024x1024 PNG format. For each dataset, put the raw image and mask files in the following format
 ```
@@ -117,7 +117,7 @@ Example inference code is provided in `example_prediction.py`. We provided examp
 
 ### Example Notebooks
 Check our inference examples for DICOM images at inference_examples_DICOM.ipynb.
- 
+
 ### Model Setup
 ```sh
 from PIL import Image
@@ -145,7 +145,7 @@ with torch.no_grad():
 ### Segmentation On Example Images
 ```sh
 # RGB image input of shape (H, W, 3). Currently only batch size 1 is supported.
-image = Image.open('examples/Part_1_516_pathology_breast.png', formats=['png']) 
+image = Image.open('examples/Part_1_516_pathology_breast.png', formats=['png'])
 image = image.convert('RGB')
 # text prompts querying objects in the image. Multiple ones can be provided.
 prompts = ['neoplastic cells', 'inflammatory cells']
@@ -198,13 +198,24 @@ Run the following commands to set up the Docker environment:
 bash docker/docker_build.sh
 bash docker/docker_run.sh
 bash docker/setup_inside_docker.sh
-source docker/data_env.sh 
+source docker/data_env.sh
 ``` -->
 
 ## Citation
+
 Please cite our paper if you use the code, model, or data.
 
-Zhao, T., Gu, Y., Yang, J. et al. A foundation model for joint segmentation, detection and recognition of biomedical objects across nine modalities. Nat Methods (2024). https://doi.org/10.1038/s41592-024-02499-w
+```bibtex
+@article{zhao2024biomedparse,
+  title = {A foundation model for joint segmentation, detection, and recognition of biomedical objects across nine modalities},
+  author = {Zhao, Theodore and Gu, Yu and Yang, Jianwei and Usuyama, Naoto and Lee, Ho Hin and Kiblawi, Sid and Naumann, Tristan and Gao, Jianfeng and Crabtree, Angela and Abel, Jacob and Moung-Wen, Christine and Piening, Brian and Bifulco, Carlo and Wei, Mu and Poon, Hoifung and Wang, Sheng},
+  journal = {Nature Methods},
+  year = {2024},
+  publisher = {Nature Publishing Group UK London},
+  url = {https://www.nature.com/articles/s41592-024-02499-w},
+  doi = {10.1038/s41592-024-02499-w}
+}
+```
 
 ## Usage and License Notices
 The model described in this repository is provided for research and development use only. The model is not intended for use in clinical decision-making or for any other clinical use, and the performance of the model for clinical use has not been established. You bear sole responsibility for any use of this model, including incorporation into any product intended for clinical use.
