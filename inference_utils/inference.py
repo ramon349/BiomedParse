@@ -74,9 +74,8 @@ def interactive_infer_image(model, image, prompts):
     # interpolate mask to ori size
     pred_mask_prob = F.interpolate(pred_masks_pos[None,], image_size[-2:], mode='bilinear')[0,:,:data['height'],:data['width']].sigmoid().cpu().numpy()
     pred_masks_pos = (1*(pred_mask_prob > 0.5)).astype(np.uint8)
-    texts = [all_classes[c] for c in pred_class]
     
-    return pred_mask_prob, texts
+    return pred_mask_prob
 
 
 

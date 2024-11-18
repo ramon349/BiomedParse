@@ -6,6 +6,7 @@ from modeling import build_model
 from utilities.distributed import init_distributed
 from utilities.arguments import load_opt_from_config_files
 from utilities.constants import BIOMED_CLASSES
+import numpy as np
 
 from inference_utils.inference import interactive_infer_image
 
@@ -32,12 +33,22 @@ with torch.no_grad():
 
 # Load image and run inference
 # RGB image input of shape (H, W, 3). Currently only batch size 1 is supported.
-image = Image.open('examples/Part_3_226_pathology_breast.png', formats=['png']) 
+image = Image.open('examples/Part_1_516_pathology_breast.png', formats=['png']) 
 image = image.convert('RGB')
 # text prompts querying objects in the image. Multiple ones can be provided.
-prompts = ['neoplastic cells in breast pathology', 'inflammatory cells']
+prompts = ['neoplastic cells', 'inflammatory cells']
 
-pred_mask, pred_text = interactive_infer_image(model, image, prompts)
+# load ground truth mask
+gt_masks = []
+for prompt in prompts:
+    gt_mask = Image.open(f"examples/Part_1_516_pathology_breast_{prompt.replace(' ', '+')}.png", formats=['png'])
+    gt_mask = 1*(np.array(gt_mask.convert('RGB'))[:,:,0] > 0)
+    gt_masks.append(gt_mask)
 
-# show prediction stats
-print(pred_mask.shape, pred_mask.sum(axis=(1,2)), pred_mask.min(axis=(1,2)), pred_mask.max(axis=(1,2)), pred_text)
+pred_mask = interactive_infer_image(model, image, prompts)
+
+# prediction with ground truth mask
+for i, pred in enumerate(pred_mask):
+    gt = gt_masks[i]
+    dice = (1*(pred>0.5) & gt).sum() * 2.0 / (1*(pred>0.5).sum() + gt.sum())
+    print(f'Dice score for {prompts[i]}: {dice:.4f}')
