@@ -47,7 +47,7 @@ Step 1. Create pretrained model folder
 ```
 mkdir pretrained
 ```
-Step 2. Download model checkpoint and put the model in the pretrained folder when runing the code. Change file name to biomed_parse.pt
+Step 2. Download model checkpoint and put the model in the pretrained folder when running the code. Change file name to biomed_parse.pt
 
 Expect future updates of the model as we are making it more robust and powerful based on feedbacks from the community. We recomment using the latest version of the model.
 
