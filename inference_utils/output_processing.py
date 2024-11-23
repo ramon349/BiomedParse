@@ -12,16 +12,26 @@ def check_mask_stats(img, mask, modality_type, target):
     # modality_type: str, see target_dist.json for the list of modality types
     # target: str, see target_dist.json for the list of targets
     
-    mask_stats = mask_stats(mask, img)
+    if modality_type not in target_dist:
+        raise ValueError(f"Currently support modality types: {list(target_dist.keys())}")
     
-    ps = [stats.ks_1samp([mask_stats[i]], stats.beta(param[0], param[1]).cdf).pvalue for i, param in enumerate(target_dist[modality_type][target])]
+    if target not in target_dist[modality_type]:
+        raise ValueError(f"Currently support targets for {modality_type}: {list(target_dist[modality_type].keys())}")
+    
+    ms = mask_stats(mask, img)
+    
+    ps = [stats.ks_1samp([ms[i]], stats.beta(param[0], param[1]).cdf).pvalue for i, param in enumerate(target_dist[modality_type][target])]
     p_value = np.prod(ps)
     
-    return p_value
+    adj_p_value = p_value**0.24    # adjustment for four test products
+    
+    return adj_p_value
     
     
 
 def mask_stats(mask, img):
+    # mask is a prediction mask with pixel values in [0, 255] for probability in [0, 1]
+    # img is a RGB image with pixel values in [0, 255]
     if mask.max() <= 127:
         return [0, 0, 0, 0]
     return [mask[mask>=128].mean()/256, img[:,:,0][mask>=128].mean()/256, 

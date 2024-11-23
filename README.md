@@ -8,6 +8,10 @@ This repository hosts the code and resources for the paper **"A Foundation Model
 
 ![Example Predictions](assets/readmes/biomedparse_prediction_examples.png)
 
+## News
+- Nov. 22, 2024: We added negative prediction p-value example in inference_example_DICOM.ipynb
+- Nov. 18, 2024: BiomedParse is officially online in [*Nature Methods*](https://aka.ms/biomedparse-paper)!
+
 ## Installation
 ```sh
 git clone https://github.com/microsoft/BiomedParse.git
