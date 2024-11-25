@@ -147,4 +147,3 @@ dependencies:
       - transformers==4.34.0
       - vision-datasets==0.2.2
       - yacs==0.1.8
-prefix: /home/theodorezhao/miniconda3/envs/biomedparse
