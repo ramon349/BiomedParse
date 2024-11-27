@@ -90,7 +90,8 @@ opt = load_opt_from_config_files(["configs/biomedparse_inference.yaml"])
 opt = init_distributed(opt)
 
 # Load model from pretrained weights
-pretrained_pth = 'pretrained/biomed_parse.pt'
+#pretrained_pth = 'pretrained/biomed_parse.pt'
+pretrained_pth = 'hf_hub:microsoft/BiomedParse'
 
 model = BaseModel(opt, build_model(opt)).from_pretrained(pretrained_pth).eval().cuda()
 with torch.no_grad():
