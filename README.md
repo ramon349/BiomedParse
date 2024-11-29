@@ -1,3 +1,7 @@
+# Notes 
+- Forked the repo for simple research use. 
+- Added my own modifications to run inference using some monai tools 
+- Right now focused only on kidney segmentation 
 # **BiomedParse**
 
 This repository hosts the code and resources for the paper **"A Foundation Model for Joint Segmentation, Detection, and Recognition of Biomedical Objects Across Nine Modalities"** (published in [*Nature Methods*](https://aka.ms/biomedparse-paper)).
