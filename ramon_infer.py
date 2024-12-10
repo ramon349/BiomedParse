@@ -19,7 +19,9 @@ from monai.transforms import (
     Resized,
     SaveImaged,
     RepeatChanneld,
-    ScaleIntensityRanged
+    ScaleIntensityRanged,
+    Invertd
+    
 )
 import matplotlib.pyplot as plt
 from monai.data import NibabelReader,Dataset
@@ -95,7 +97,7 @@ def main():
             Orientationd(keys=['image','label'],axcodes='RAS'), # i prefer using ras 
             ScaleIntensityRanged(keys=['image'],a_min=lower,a_max=upper,b_min=None,b_max=None),
             SliceNormd(keys=['image']),
-            SquarePadd(keys=['image','label']),
+            SquarePadd(['image','label'],(-1,-1,-1)),
             Resized(keys=['image','label'],spatial_size=(1024,1024,-1),  mode=["trilinear ", "nearest"]),
             RepeatChanneld(keys=['image'],repeats=3)
             ]
@@ -121,10 +123,17 @@ def main():
     preds = list() 
     post_transforms = Compose(
             [
+                Invertd(
+                    keys=["preds"],
+                    orig_keys=["label"],
+                    transform=transforms,
+                    nearest_interp=False,
+                    to_tensor=True,
+                ),
                 SaveImaged(
                     keys=["preds"],
                     output_dir=out_dir,
-                    meta_keys=['image_meta_dict'],
+                    meta_keys=['label_meta_dict'],
                     output_postfix="seg",
                     resample=False,
                     data_root_dir="",
@@ -138,13 +147,10 @@ def main():
     for data_sample in tqdm(dl,total=len(dl)): 
         #try: 
         #Use Sliding window inference to infer across Z dimension of slices 
-        slide_preds = sliding_window_inference(data_sample['image'].to(torch.float),roi_size=(1024,1024,1),sw_batch_size=1,predictor=lambda x: pred_wrap(model,x),sw_device='cpu',device='cpu',buffer_dim=-1,progress=True)
+        slide_preds = sliding_window_inference(data_sample['image'].to(torch.float),roi_size=(1024,1024,1),sw_batch_size=1,predictor=lambda x: pred_wrap(model,x),sw_device='cpu',device='cpu',buffer_dim=-1,progress=True).squeeze(0)
         #make a metatensor to preserve some important info
-        data_sample['preds']= monai.data.MetaTensor(slide_preds,affine=data_sample['label'].meta['affine'],meta=data_sample['label'].meta)
+        data_sample['preds'] = monai.data.MetaTensor(slide_preds,affine=data_sample['label'].meta['affine'],meta=data_sample['label'].meta)
         #Reisze output image from 1024,1024,-1 to original image size 
-        orig_size= data_sample['label'].shape[-3:] 
-        data_sample['preds'] =  F.interpolate(data_sample['preds'],size=orig_size,mode='nearest')
-        #save the image
         other = post_transforms(data_sample) 
         # get  file paths for later
         orig_path = other['preds'].meta['filename_or_obj']

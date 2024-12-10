@@ -7,7 +7,7 @@ from inference_utils.processing_utils import process_intensity_image
 import torch 
 import numpy as np 
 from einops import rearrange
-from monai.transforms import Pad,SpatialPad
+from monai.transforms import Pad,SpatialPad,SpatialPadd,Padd
 from collections.abc import Callable, Sequence
 from itertools import chain
 from math import ceil
@@ -16,6 +16,7 @@ from monai.utils import Method,look_up_option,PytorchPadMode,fall_back_tuple
 from monai.transforms.croppad.functional import pad_func
 from monai.data.meta_tensor import MetaTensor
 import pdb 
+from monai.config import IndexSelection, KeysCollection, SequenceStr
 
 #create the manuscript transforms as monai transforms 
 class BiomedScale(Transform):
@@ -79,8 +80,6 @@ class SpatialPadSquare(SpatialPad):
 
         """ 
         h,w,d =  spatial_shape
-        if h==w:  #early exit #do not pad 
-            return [ [(0,0) for i,sp_i in enumerate(spatial_shape)]]  
         #w_padding 
         width = max((h-w),0)
         w_pad = (int(width//2),int(width-(width//2)))
@@ -124,12 +123,8 @@ class SpatialPadSquare(SpatialPad):
         img_t = convert_to_tensor(data=img, track_meta=get_track_meta())
         lazy_ = self.lazy if lazy is None else lazy
         return pad_func(img_t, to_pad_, self.get_transform_info(), mode_, lazy_, **kwargs_)
-class SquarePadd(MapTransform):
-    def __init__(self,keys,allow_missing_keys=False):
-        super().__init__(keys, allow_missing_keys)
-        self.converter = SpatialPadSquare(spatial_size=(719,719,-1),mode='constant',method='symmetric')
-    def __call__(self, data):
-        d = dict(data)
-        for key in self.key_iterator(d):
-            d[key] = self.converter(d[key])
-        return d
+
+class SquarePadd(Padd):
+    def __init__(self, keys: KeysCollection, spatial_size: Sequence[int] | int, method: str = Method.SYMMETRIC, mode: SequenceStr = PytorchPadMode.CONSTANT, allow_missing_keys: bool = False, lazy: bool = False, **kwargs) -> None:
+        padder = SpatialPadSquare(spatial_size, method, lazy=lazy, **kwargs)
+        Padd.__init__(self, keys, padder=padder, mode=mode, allow_missing_keys=allow_missing_keys, lazy=lazy)
