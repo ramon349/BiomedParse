@@ -116,7 +116,7 @@ def main():
     #loads test set only 
     with open(pkl_path,'rb') as f:
         ts =  pkl.load(f)[-1]
-    tr_ds = Dataset(ts[53:],transform=transforms)
+    tr_ds = Dataset(ts,transform=transforms)
     # Per docs we can only have a batchsize of 1
     dl = DataLoader(tr_ds,batch_size=1,num_workers=1,persistent_workers=True)
     all_paths = list() 
