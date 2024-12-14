@@ -11,6 +11,7 @@ from utilities.arguments import load_opt_from_config_files
 from utilities.constants import BIOMED_CLASSES
 import pickle as pkl 
 from monai.inferers import sliding_window_inference
+from skimage import transform
 from monai.transforms import (
     Compose,
     LoadImaged,
@@ -35,8 +36,8 @@ import argparse
 from torch.nn import functional as F
 from tqdm import tqdm 
 import os
-from ramon_utilities.custom_transforms import SliceNormd,SquarePadd
-
+from ramon_utilities.custom_transforms import SliceNormd,SquarePadd,SkResized
+from inference_utils.output_processing import check_mask_stats
 def subject_formater(meta_in, ignore):
     pid = meta_in["filename_or_obj"]
     out_form = sha224(pid.encode("utf-8")).hexdigest()
@@ -58,12 +59,16 @@ def pred_wrap(model,vol_slice):
     """ Custom forward method. Converts to RGB PIL from tensor then runs 
     inference and back to tensor. TODO: Make prompts customizable 
     """
-    data = rearrange(vol_slice,"b c h w l -> b h w c l").squeeze(-1).squeeze(0)
+    data = rearrange(vol_slice.squeeze(-1).squeeze(0),"c h w -> h w c ")
     arr = np.array(data).astype(np.uint8)
     data= Image.fromarray(arr)
     out = interactive_infer_image(model,data,['Segment all kidneys'])
-    tens = torch.tensor(out).unsqueeze(-1).unsqueeze(0).to(torch.float)
-    return  tens 
+    scaled =  (255*(out)).astype(int)
+    thresh = check_mask_stats(arr,scaled[0,:,:],"CT-Abdomen","kidney") 
+    tens = torch.tensor(out).unsqueeze(-1).unsqueeze(0)
+    if thresh <= 0.005: 
+        tens = torch.zeros_like(tens)
+    return  tens.to(torch.float)
 def check_if_exists(my_tensors,output_dir): 
     #little helper i'm keeping around just incase
     output_stuff = subject_formater(my_tensors.meta,None)['subject']
@@ -95,10 +100,9 @@ def main():
             LoadImaged(keys=['image','label'],reader=NibabelReader,image_only=False), #need the metadata for saving
             EnsureChannelFirstd(keys=['image','label']),
             Orientationd(keys=['image','label'],axcodes='RAS'), # i prefer using ras 
-            ScaleIntensityRanged(keys=['image'],a_min=lower,a_max=upper,b_min=None,b_max=None),
-            SliceNormd(keys=['image']),
+            SliceNormd(keys=['image'],a_min=lower,a_max=upper),
             SquarePadd(['image','label'],(-1,-1,-1)),
-            Resized(keys=['image','label'],spatial_size=(1024,1024,-1),  mode=["trilinear ", "nearest"]),
+            SkResized(keys=['image','label'],spatial_dim=(1024,1024)),
             RepeatChanneld(keys=['image'],repeats=3)
             ]
     )
@@ -150,6 +154,7 @@ def main():
         slide_preds = sliding_window_inference(data_sample['image'].to(torch.float),roi_size=(1024,1024,1),sw_batch_size=1,predictor=lambda x: pred_wrap(model,x),sw_device='cpu',device='cpu',buffer_dim=-1,progress=True).squeeze(0)
         #make a metatensor to preserve some important info
         data_sample['preds'] = monai.data.MetaTensor(slide_preds,affine=data_sample['label'].meta['affine'],meta=data_sample['label'].meta)
+
         #Reisze output image from 1024,1024,-1 to original image size 
         other = post_transforms(data_sample) 
         # get  file paths for later
